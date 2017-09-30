@@ -25,13 +25,13 @@ class penyakit extends CI_Controller{
 			$file['KdPenyakit']	= $penyakit->row()->KdPenyakit;
 			$file['Penyakit']	= $penyakit->row()->Penyakit;
 			$file['Deskripsi']	= $penyakit->row()->Deskripsi;
-			$file['Solusi']	= $penyakit->row()->Solusi;
+			//$file['Solusi']	= $penyakit->row()->Solusi;
 		}else{
 			$file['IdPenyakit']	= "";
 			$file['KdPenyakit']	= $KdPenyakit;
 			$file['Penyakit']	= "";
 			$file['Deskripsi']	= "";
-			$file['Solusi']	= "";
+			//$file['Solusi']	= "";
 		}
 		
 		$file['page']	= "penyakit/penyakit_form";
@@ -41,8 +41,8 @@ class penyakit extends CI_Controller{
 	public function penyakit_save(){
 		$IdPenyakit	= $this->m_query->replace($this->input->post("IdPenyakit"));
 		$KdPenyakit	= $this->m_query->replace($this->input->post("KdPenyakit"));
-		$Penyakit		= $this->m_query->replace($this->input->post("Penyakit"));
-		$Deskripsi		= $this->m_query->replace($this->input->post("Deskripsi"));
+		$Penyakit	= $this->m_query->replace($this->input->post("Penyakit"));
+		$Deskripsi	= $this->m_query->replace($this->input->post("Deskripsi"));
 		$Solusi		= $this->m_query->replace($this->input->post("Solusi"));
 		$Foto		= $_FILES['Foto'];
 		$xu		= 0; $FotoUpload="";
@@ -57,12 +57,11 @@ class penyakit extends CI_Controller{
 				}
 			}
 		}
-		
-		
+				
 		if($IdPenyakit==""){
-			$query	= "Insert into mza_penyakit set KdPenyakit='$KdPenyakit', Penyakit='$Penyakit', Deskripsi='$Deskripsi', Solusi='$Solusi', Foto='".$FotoUpload."'";
+			$query	= "Insert into mza_penyakit set KdPenyakit='$KdPenyakit', Penyakit='$Penyakit', Deskripsi='$Deskripsi',  Foto='".$FotoUpload."'";
 		}else{
-			$query	= "update mza_penyakit set KdPenyakit='$KdPenyakit', Penyakit='$Penyakit', Deskripsi='$Deskripsi',Solusi='$Solusi', Foto='".$FotoUpload."' WHERE IdPenyakit='$IdPenyakit'";
+			$query	= "update mza_penyakit set KdPenyakit='$KdPenyakit', Penyakit='$Penyakit', Deskripsi='$Deskripsi', Foto='".$FotoUpload."' WHERE IdPenyakit='$IdPenyakit'";
 		}
 		$this->m_query->get_save("$query");
 		redirect("penyakit");

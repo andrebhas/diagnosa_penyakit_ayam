@@ -1,3 +1,4 @@
+<script src="<?php echo base_url('assets/js/ckeditor/ckeditor.js') ?>"></script>
 <section id="partner" class="home-section paddingbot-60">	
 	<div class="container marginbot-50">
 		<div class="row">
@@ -32,18 +33,23 @@
 			
 			<div class="form-group">
 				<label for="inputEmail3" class="col-sm-2 control-label">Deskripsi</label>
-				<div class="col-sm-4">
-					<textarea name="Deskripsi" class="form-control"  id="Deskripsi" required="" placeholder="Deskripsi Mengatasi Penyaki..."><?php echo $Deskripsi; ?></textarea>
+				<div class="col-lg-8">
+					<textarea name="Deskripsi" class="form-control"  id="Deskripsi" required="" ><?php echo $Deskripsi; ?></textarea>
+					<script>
+						CKEDITOR.replace( 'Deskripsi' );
+					</script>
 				</div>
 			</div>
-			
+
+<!--	
 			<div class="form-group">
 				<label for="inputEmail3" class="col-sm-2 control-label">Solusi</label>
 				<div class="col-sm-4">
 					<textarea name="Solusi" class="form-control"  id="Solusi" required="" placeholder="Solusi Mengatasi Penyaki..."><?php echo $Solusi; ?></textarea>
 				</div>
 			</div>
-			
+-->			
+
 			<div class="form-group">
 				<label for="Foto" class="col-sm-2 control-label">Foto Penyakit</label>
 				<div class="col-sm-4">
@@ -53,7 +59,7 @@
 			
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-4">
-					<button type="submit" class="btn btn-success"><i class=" glyphicon glyphicon-saved"></i> Submit</button>
+					<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-saved"></i> Submit</button>
 					<a href="<?php echo site_url('penyakit'); ?>" class="btn btn-danger"><i class=" glyphicon glyphicon-th-list"></i> Back</a>
 				</div>
 			</div>

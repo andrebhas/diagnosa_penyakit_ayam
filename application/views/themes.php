@@ -75,7 +75,7 @@
 			</nav>
 	
 			<!-- Section: intro -->
-			<section id="intro" class="intro">
+			<section id="intro" class="intro" <?php if ( isset($display)){ echo 'style="display:none"'; }?> >
 				<div class="intro-content">
 					<div class="container">
 						<div class="row">

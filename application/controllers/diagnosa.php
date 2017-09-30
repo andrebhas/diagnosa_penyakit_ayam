@@ -59,97 +59,66 @@ class diagnosa extends CI_Controller{
 		redirect("diagnosa/klasifikasi/".$IdDiagnosa);
 	}
 	
-	// public function hasil_diagnosa(){
-	// 	$IdDiagnosa	= $this->uri->segment(3);
-	// 	$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'")->row();
-	// 	$file['IdDiagnosa']	= $diagnosa->IdDiagnosa;
-	// 	$file['NoDiagnosa']	= $diagnosa->NoDiagnosa;
-	// 	$file['Nama']		= $diagnosa->Nama;
-	// 	$file['Tanggal']	= $diagnosa->Tanggal;
-	// 	$file['getPenyakit']	= $this->db->query("select 
-	// 		a . *,
-	// 		(select count(e.IdDataset) from mza_dataset e where e.IdPenyakit=a.IdPenyakit) as Jml,
-	// 		(select count(b.IdDataset) from mza_dataset b) as Pembagi
-	// 		from
-	// 		mza_penyakit a
-	// 		inner join
-	// 		mza_penyakitgejala b ON b.IdPenyakit = a.IdPenyakit
-	// 		inner join
-	// 		mza_gejala c ON c.IdGejala = b.IdGejala
-	// 		inner join
-	// 		mza_diagnosadetail d ON d.IdGejala = c.IdGejala
-	// 		and d.`Status` = 'Y' and d.IdDiagnosa='".$diagnosa->IdDiagnosa."'
-	// 		group by a.IdPenyakit
-	// 		order by a.IdPenyakit asc")->result();
-	// 	$file['page']	  	= "diagnosa/diagnosa_hasil";
-	// 	$this->load->view('themes',$file);
-	// }
+
+
 
 	public function klasifikasi($IdDiagnosa)
 	{
 		$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'")->row();
 		$detail_diagnosa = $this->m_query->get_detail_diagnosa($IdDiagnosa);
 		$penyakit = $this->m_query->get_penyakit();
-		
+		/* 
+			1. menghitung hasil bagi antara idGejala yg "ya" dengan jumlah dataset yang memiliki gejala yang di inputkan
+			Loop i ---> P(idGejala = i | Y= ya) = hasil_bagi  
+		*/
 		foreach ($detail_diagnosa as $val) {
 			foreach ($penyakit as $p) {
 				$hasil_bagi[$val->IdGejala]['idPkt_'.$p->IdPenyakit] = $this->m_query->get_klasifikasi($val->IdGejala,$p->IdPenyakit)->hasil_bagi;
 			}
 		}
-		//echo json_encode($hasil_bagi);
+		//print_r($hasil_bagi);
+
+		/* 
+			2. mengalikan semua hasil bagi sesuai jenis penyakit  
+		*/
 		foreach ($penyakit as $p) {
 			$hasil_kali[$p->IdPenyakit] = array_product(array_column($hasil_bagi, 'idPkt_'.$p->IdPenyakit));
 		}
 		arsort($hasil_kali);
 		//print_r($hasil_kali);
+
+		/* 
+			3. mengambil peringkat idPenyakit tertinggi (hasil akhlir)  
+		*/
 		$max = array_keys($hasil_kali, max($hasil_kali));
 		$id_penyakit_tertingggi = $max[0];
 		$val_tertinggi = $hasil_kali[$max[0]];
-		
-		echo $id_penyakit_tertingggi."  => ".$val_tertinggi ;
+		//echo $id_penyakit_tertingggi."  => ".$val_tertinggi ;
 
+		/* 
+			4. menampilkan hasil diagnosa  
+		*/
+		$hasil_diagnosa = $this->m_query->get_penyakit_by_id($id_penyakit_tertingggi);
 		$data = array(
+			'page' => "diagnosa/diagnosa_hasil",
+			'display' => "none",
 			'IdDiagnosa' => $diagnosa->IdDiagnosa,
 			'NoDiagnosa' => $diagnosa->NoDiagnosa,
 			'Nama' => $diagnosa->Nama,
 			'Tanggal' => $diagnosa->Tanggal,
 			'detail' => $detail_diagnosa,
-			'dataPenyakit' => $penyakit
+			'dataPenyakit' => $penyakit,
+			'hasil_diagnosa_all' => $hasil_kali,
+			'hasil_diagnosa' =>  $hasil_diagnosa,
+			'nilai_diagnosa' => $val_tertinggi,
 		);
+		$this->load->view('themes',$data);
 		//echo json_encode($data);
-
-		// Array ( 
-		// 	[1] => Array ( [1] => 0.1033 [2] => 0.0067 [3] => 0.0133 [4] => 0.0100 [5] => 0.1533 [6] => 0.0900 [8] => 0.1100 [9] => 0.0867 )[2] => Array ( [1] => 0.0800 [2] => 0.0100 [3] => 0.0100 [4] => 0.0133 [5] => 0.1500 [6] => 0.0067 [8] => 0.0067 [9] => 0.0100 )[3] => Array ( [1] => 0.0800 [2] => 0.0100 [3] => 0.0233 [4] => 0.0100 [5] => 0.0133 [6] => 0.0100 [8] => 0.0067 [9] => 0.0100 )[4] => Array ( [1] => 0.0667 [2] => 0.0133 [3] => 0.0133 [4] => 0.0200 [5] => 0.0100 [6] => 0.0133 [8] => 0.0100 [9] => 0.0067 )[5] => Array ( [1] => 0.1333 [2] => 0.0933 [3] => 0.0100 [4] => 0.0100 [5] => 0.1567 [6] => 0.1100 [8] => 0.1000 [9] => 0.0767 )
-		// )
-
 	}
 	
-	public function detail_perhitungan(){
-		$IdDiagnosa	= $this->uri->segment(3);
-		$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'")->row();
-		$file['IdDiagnosa']	= $diagnosa->IdDiagnosa;
-		$file['NoDiagnosa']	= $diagnosa->NoDiagnosa;
-		$file['Nama']		= $diagnosa->Nama;
-		$file['Tanggal']	= $diagnosa->Tanggal;
-		$file['getPenyakit']	= $this->db->query("select 
-			a . *,
-			(select count(e.IdDataset) from mza_dataset e where e.IdPenyakit=a.IdPenyakit) as Jml,
-			(select count(b.IdDataset) from mza_dataset b) as Pembagi
-			from
-			mza_penyakit a
-			inner join
-			mza_penyakitgejala b ON b.IdPenyakit = a.IdPenyakit
-			inner join
-			mza_gejala c ON c.IdGejala = b.IdGejala
-			inner join
-			mza_diagnosadetail d ON d.IdGejala = c.IdGejala
-			and d.`Status` = 'Y' and d.IdDiagnosa='".$diagnosa->IdDiagnosa."'
-			group by a.IdPenyakit
-			order by a.IdPenyakit asc")->result();
-		$file['page']	  	= "diagnosa/detail_perhitungan";
-		$this->load->view('themes',$file);
-	}
-	
+
+
+
 	public function simpan_dataset(){
 		$IdDiagnosa	= $this->uri->segment(3);
 		$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'");

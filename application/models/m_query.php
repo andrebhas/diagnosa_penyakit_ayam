@@ -63,7 +63,11 @@ class m_query extends CI_Model{
 
 	function get_detail_diagnosa($id_diagnosa)
 	{
-		$sql = "SELECT * FROM `mza_diagnosadetail` WHERE `IdDiagnosa` = $id_diagnosa AND Status = 'Y'";
+		$sql = "SELECT mza_diagnosadetail.IdDiagnosa, mza_diagnosadetail.IdGejala, 
+					   mza_diagnosadetail.Status, mza_gejala.KdGejala, mza_gejala.Gejala
+				FROM mza_diagnosadetail
+				JOIN mza_gejala ON mza_gejala.IdGejala = mza_diagnosadetail.IdGejala
+				WHERE `IdDiagnosa` = $id_diagnosa AND Status = 'Y'";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -73,6 +77,13 @@ class m_query extends CI_Model{
 		$sql = "SELECT * FROM mza_penyakit";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	public function get_penyakit_by_id($idP)
+	{
+		$sql = "SELECT * FROM mza_penyakit where idPenyakit = $idP";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 
 	function get_klasifikasi($id_gejala,$id_penyakit)
