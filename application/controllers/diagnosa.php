@@ -90,24 +90,23 @@ class diagnosa extends CI_Controller{
 		$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'")->row();
 		$detail_diagnosa = $this->m_query->get_detail_diagnosa($IdDiagnosa);
 		$penyakit = $this->m_query->get_penyakit();
-		foreach ($detail_diagnosa as $dd) {
-			foreach ($penyakit as $p) {
-				$hasil_bagi[$dd->IdGejala][$p->IdPenyakit] = $this->m_query->get_klasifikasi($dd->IdGejala,$p->IdPenyakit)->hasil_bagi;
-			}
-		}
-		echo json_encode($hasil_bagi);
-		// foreach ($penyakit as $p) {
-		// 	foreach ($detail_diagnosa as $dd) {
-		// 		$hasil_kali[$p->IdPenyakit] = array_product(array_column($hasil_bagi[$dd->IdGejala], $p->IdPenyakit));
-		// 	}
-		// }
 		
-		foreach ($detail_diagnosa as $dd) {
+		foreach ($detail_diagnosa as $val) {
 			foreach ($penyakit as $p) {
-				$hasil_kali[$p->IdPenyakit] = array_product($hasil_bagi[$dd->IdGejala]);
+				$hasil_bagi[$val->IdGejala]['idPkt_'.$p->IdPenyakit] = $this->m_query->get_klasifikasi($val->IdGejala,$p->IdPenyakit)->hasil_bagi;
 			}
 		}
-		echo json_encode($hasil_kali);
+		//echo json_encode($hasil_bagi);
+		foreach ($penyakit as $p) {
+			$hasil_kali[$p->IdPenyakit] = array_product(array_column($hasil_bagi, 'idPkt_'.$p->IdPenyakit));
+		}
+		arsort($hasil_kali);
+		//print_r($hasil_kali);
+		$max = array_keys($hasil_kali, max($hasil_kali));
+		$id_penyakit_tertingggi = $max[0];
+		$val_tertinggi = $hasil_kali[$max[0]];
+		
+		echo $id_penyakit_tertingggi."  => ".$val_tertinggi ;
 
 		$data = array(
 			'IdDiagnosa' => $diagnosa->IdDiagnosa,
@@ -117,9 +116,11 @@ class diagnosa extends CI_Controller{
 			'detail' => $detail_diagnosa,
 			'dataPenyakit' => $penyakit
 		);
-		echo json_encode($data);
+		//echo json_encode($data);
 
-
+		// Array ( 
+		// 	[1] => Array ( [1] => 0.1033 [2] => 0.0067 [3] => 0.0133 [4] => 0.0100 [5] => 0.1533 [6] => 0.0900 [8] => 0.1100 [9] => 0.0867 )[2] => Array ( [1] => 0.0800 [2] => 0.0100 [3] => 0.0100 [4] => 0.0133 [5] => 0.1500 [6] => 0.0067 [8] => 0.0067 [9] => 0.0100 )[3] => Array ( [1] => 0.0800 [2] => 0.0100 [3] => 0.0233 [4] => 0.0100 [5] => 0.0133 [6] => 0.0100 [8] => 0.0067 [9] => 0.0100 )[4] => Array ( [1] => 0.0667 [2] => 0.0133 [3] => 0.0133 [4] => 0.0200 [5] => 0.0100 [6] => 0.0133 [8] => 0.0100 [9] => 0.0067 )[5] => Array ( [1] => 0.1333 [2] => 0.0933 [3] => 0.0100 [4] => 0.0100 [5] => 0.1567 [6] => 0.1100 [8] => 0.1000 [9] => 0.0767 )
+		// )
 
 	}
 	
