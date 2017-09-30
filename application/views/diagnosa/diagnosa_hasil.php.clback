@@ -1,0 +1,75 @@
+<section id="partner" class="home-section paddingbot-60">	
+	<div class="container marginbot-50">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2">
+				<div class="wow lightSpeedIn" data-wow-delay="0.1s">
+					<div class="section-heading text-center">
+						<h2 class="h-bold">Report Diagnosa</h2>
+						<p>Hasil Diagnosa Penyakit Ayam Broiler &amp; Petelur</p>
+					</div>
+				</div>
+				<div class="divider-short"></div>
+			</div>
+		</div>
+	</div>
+		
+	<div class="container">
+		<form class="form-horizontal" method="post" action="">
+			<div class="form-group">
+				<label for="NoDiagnosa" class="col-sm-2 control-label">No.Diagnosa</label>
+				<label for="NoDiagnosa" class="col-sm-10 control-label" style="text-align: left;">: <?php echo $NoDiagnosa; ?></label>
+			</div>
+			
+			<div class="form-group">
+				<label for="NoDiagnosa" class="col-sm-2 control-label">Nama Ayam</label>
+				<label for="NoDiagnosa" class="col-sm-10 control-label" style="text-align: left;">: <?php echo $Nama; ?></label>
+			</div>
+			
+			<div class="form-group">
+				<label for="NoDiagnosa" class="col-sm-2 control-label">Tanggal Diagnosa</label>
+				<label for="NoDiagnosa" class="col-sm-10 control-label" style="text-align: left;">: <?php echo $this->m_query->tgl($Tanggal); ?></label>
+			</div>
+			
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>No</th>
+						<th>Kode Penyakit</th>
+						<th>Penyakit</th>
+						<th>P</th>
+						<th>M</th>
+						<th>Nilai <sub>v</sub></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$No=0;
+					foreach($qpenyakit as $key => $vpe){
+						$No++;
+						$P = 1/$jpenyakit;
+						$M = $jgejala;
+						$QProba = $this->m_query->get_array("select 
+							dd.*
+							from
+							mza_diagnosadetail dd
+							inner join
+							mza_diagnosa d ON d.IdDiagnosa = dd.IdDiagnosa
+							where
+							dd.`Status` = 'Y'")->; 
+						?>
+						<tr>
+							<td class="text-right"><?php echo $No; ?></td>
+							<td class="text-right"><?php echo $vpe->KdPenyakit; ?></td>
+							<td><?php echo $vpe->Penyakit; ?></td>
+							<td class="text-center"><?php echo $P; ?></td>
+							<td class="text-center"><?php echo $M; ?></td>
+							<td><?php echo $No; ?></td>
+						</tr>
+						<?php
+					}
+					?>
+				</tbody>
+			</table>
+		</form>
+	</div>
+</section>
