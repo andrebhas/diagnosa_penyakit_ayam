@@ -20,7 +20,7 @@
 				<label for="inputEmail3" class="col-sm-2 control-label">Search</label>
 				<div class="col-sm-5">
 					<div class="input-group">
-						<input type="text" class="form-control" id="Search" name="Search" value="<?php echo $this->input->post('Search'); ?>" placeholder="Search...">
+						<input type="text" class="form-control" id="Search" name="Search" value="<?php echo $this->input->post('Search'); ?>" placeholder="Search Penyakit ... ">
 						<div class="input-group-addon"><i class=" glyphicon glyphicon-search"></i></div>
 					</div>
 				</div>
@@ -29,7 +29,7 @@
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-4">
 					<button type="submit" class="btn btn-primary"><i class=" glyphicon glyphicon-search"></i> Search</button>
-					<a href="<?php echo site_url('dataset/dataset_form'); ?>" class="btn btn-warning"><i class=" glyphicon glyphicon-plus"></i> Dataset</a>
+					<a href="<?php echo site_url('diagnosa/laporan'); ?>" class="btn btn-warning"><i class=" glyphicon glyphicon-plus"></i> Dataset</a>
 				</div>
 			</div>
 		</form>
@@ -40,7 +40,6 @@
 					<table class="table table-bordered table-hover">
 						<thead>
 							<tr>
-								<th>#</th>
 								<th>No.Dataset</th>
 								<th>Gejala</th>
 								<th>Penyakit</th>
@@ -49,22 +48,15 @@
 						</thead>
 						<tbody>
 							<?php
-							$No=0;
-							foreach($qdataset as $key => $row){ $No++;
-							$qgejala = $this->m_query->get_array("select g.IdGejala, g.KdGejala, g.Gejala from mza_datasetdetail dt inner join mza_gejala g on g.IdGejala=dt.IdGejala where dt.`Status`='Y' and dt.IdDataset='".$row->IdDataset."' order by g.KdGejala asc");
-							$Jml = $qgejala->num_rows(); $NG=0; $Gejala="";
-							foreach($qgejala->result() as $kgej => $vgej){
-								$NG++;
-								if($NG==1){ $Gejala = $vgej->KdGejala;
-								}elseif($NG==$Jml){ $Gejala = $Gejala." dan ".$vgej->KdGejala;
-								}else{ $Gejala = $Gejala.", ".$vgej->KdGejala; }
-							}
-							
-							?>
+							foreach($qdataset as $key => $row){ ?>
 								<tr>
-									<td class="text-right"><?php echo $No; ?></td>
 									<td class="text-right"><?php echo $row->NoDiagnosa; ?></td>
-									<td class="text-left"><?php echo $Gejala; ?></td>
+									<td class="text-left"><?php 
+										$gejala = $this->m_query->get_detail_dataset_by_idDtSet($row->IdDataset);
+										foreach ($gejala as $key => $val) {
+											echo $val->KdGejala." - ".$val->Gejala."<br>";
+										}
+									?></td>
 									<td class="text-left"><?php echo $row->Penyakit; ?></td>
 									<td>
 										<div class="btn-group btn-group-sm" role="group" aria-label="Small button group">

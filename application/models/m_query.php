@@ -61,6 +61,20 @@ class m_query extends CI_Model{
 		return $return;
 	}
 
+	function get_dt_diagnosa()
+	{
+		$sql = "select * from mza_diagnosa WHERE status_simpan = 0";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_dt_diagnosa_by_id($id)
+	{
+		$sql = "select * from mza_diagnosa WHERE IdDiagnosa = ".$id;
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function get_detail_diagnosa($id_diagnosa)
 	{
 		$sql = "SELECT mza_diagnosadetail.IdDiagnosa, mza_diagnosadetail.IdGejala, 
@@ -72,14 +86,14 @@ class m_query extends CI_Model{
 		return $query->result();
 	}
 
-	public function get_penyakit()
+	function get_penyakit()
 	{
 		$sql = "SELECT * FROM mza_penyakit";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
-	public function get_penyakit_by_id($idP)
+	function get_penyakit_by_id($idP)
 	{
 		$sql = "SELECT * FROM mza_penyakit where idPenyakit = $idP";
 		$query = $this->db->query($sql);
@@ -105,6 +119,42 @@ class m_query extends CI_Model{
 			WHERE mza_datasetdetail.IdGejala =".$id_gejala;
 		$query = $this->db->query($sql);
 		return $query->row();
+	}
+
+	function get_detail_dataset_by_idDtSet($idDataset)
+	{
+		$sql = "
+			SELECT mza_datasetdetail.IdDataset, mza_datasetdetail.IdGejala, mza_datasetdetail.Status, mza_gejala.KdGejala, mza_gejala.Gejala
+			FROM mza_datasetdetail 
+			JOIN mza_gejala ON mza_datasetdetail.IdGejala = mza_gejala.IdGejala
+			WHERE mza_datasetdetail.Status = 'Y' AND mza_datasetdetail.IdDataset = ".$idDataset;
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_dataset_by_NoDiagnosa($noD)
+	{
+		$sql = "SELECT * FROM `mza_dataset` WHERE `NoDiagnosa` = '$noD'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function insert_dataset($data)
+	{
+		$this->db->insert('mza_dataset', $data);
+	}
+
+	function update_datadiagnosa($idDiagnosa)
+	{
+		$this->db->set('status_simpan', 1);
+		$this->db->where('IdDiagnosa', $idDiagnosa);
+		$this->db->update('mza_diagnosa');
+	}
+
+	function insert_datasetDetail($iddataset,$idgejala,$status)
+	{
+		$sql = "INSERT INTO `mza_datasetdetail` (`IdDataset`, `IdGejala`, `Status`) VALUES ('$iddataset', '$idgejala', '$status')";
+		$this->db->query($sql);
 	}
 	
 }

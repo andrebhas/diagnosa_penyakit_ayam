@@ -1,6 +1,3 @@
-<?php
-$this->m_query->get_array("UPDATE `mza_penyakit` set Hasil=0");
-?>
 <section id="partner" class="home-section paddingbot-60">	
 	<div class="container marginbot-50">
 		<div class="row">
@@ -16,6 +13,11 @@ $this->m_query->get_array("UPDATE `mza_penyakit` set Hasil=0");
 						<p class="h-bold">Kode Diagnosa : <?php echo $NoDiagnosa; ?> | Tanggal : <?php echo $this->m_query->tgl($Tanggal); ?></p>
 						<h4 class="h-bold">Ayam Terdiagnosa Penyakit <span class="text-danger"><?php echo $hasil_diagnosa->Penyakit ?></span> </h4>
 						<button class="btn btn-success btn-lg" data-toggle="modal" data-target="#detailHitung"> Detail</button>
+						<?php if ($lap != null) {
+						?>
+								<a class="btn btn-success btn-lg" href="<?php echo base_url('index.php/diagnosa/laporan' )?>">Back</a>
+						<?php
+						}?>
 					</div>
 				</div>
 			</div>

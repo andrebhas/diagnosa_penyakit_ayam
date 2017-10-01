@@ -58,11 +58,14 @@ class diagnosa extends CI_Controller{
 		}
 		redirect("diagnosa/klasifikasi/".$IdDiagnosa);
 	}
+
+
+
 	
 
 
 
-	public function klasifikasi($IdDiagnosa)
+	public function klasifikasi($IdDiagnosa,$lap=null)
 	{
 		$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'")->row();
 		$detail_diagnosa = $this->m_query->get_detail_diagnosa($IdDiagnosa);
@@ -111,58 +114,40 @@ class diagnosa extends CI_Controller{
 			'hasil_diagnosa_all' => $hasil_kali,
 			'hasil_diagnosa' =>  $hasil_diagnosa,
 			'nilai_diagnosa' => $val_tertinggi,
+			'lap' => $lap,
 		);
 		$this->load->view('themes',$data);
-		//echo json_encode($data);
 	}
 	
-
-
-
-	public function simpan_dataset(){
-		$IdDiagnosa	= $this->uri->segment(3);
-		$diagnosa	= $this->m_query->get_array("select * from mza_diagnosa WHERE IdDiagnosa='".$IdDiagnosa."'");
-		if($diagnosa->num_rows()>0){
-			$NoDiagnosa	= $diagnosa->row()->NoDiagnosa;
-			$IdPenyakit	= $diagnosa->row()->IdPenyakit;
-			$get=$this->db->query("select * from mza_dataset where NoDiagnosa='".$NoDiagnosa."'");
-			if($get->num_rows()<=0){
-				$this->db->query("INSERT INTO mza_dataset SET NoDiagnosa='".$NoDiagnosa."', IdPenyakit='".$IdPenyakit."'");
-			}ELSE{
-				$this->db->query("UPDATE mza_dataset SET IdPenyakit='".$IdPenyakit."' where NoDiagnosa='".$NoDiagnosa."'");
-			}
-			$get=$this->db->query("select * from mza_dataset where NoDiagnosa='".$NoDiagnosa."'");
-			
-			$gejala	= $this->m_query->get_array("select * from mza_diagnosadetail WHERE IdDiagnosa='".$IdDiagnosa."'")->result();
-			foreach($gejala as $ket => $val){
-				$valid	= $this->db->query("select * from mza_datasetdetail where IdDataset='".$get->row()->IdDataset."'
-					and IdGejala='".$val->IdGejala."'");
-				if($valid->num_rows()>0){
-					$this->db->query("UPDATE mza_datasetdetail SET Status='".$val->Status."' where IdDataset='".$get->row()->IdDataset."'
-						and IdGejala='".$val->IdGejala."'");
-				}else{
-					$this->db->query("INSERT INTO mza_datasetdetail SET Status='".$val->Status."' , IdDataset='".$get->row()->IdDataset."'
-						, IdGejala='".$val->IdGejala."'");
-				}
-			}
-			redirect('diagnosa/laporan');
-		}else{
-			redirect('diagnosa/laporan');
+	public function simpan_dataset($IdDiagnosa,$IdPenyakit){
+		$dt_diagnosa = $this->m_query->get_dt_diagnosa_by_id($IdDiagnosa);
+		$dataset = array(
+			"NoDiagnosa" => $dt_diagnosa->NoDiagnosa,
+			"IdPenyakit" => $IdPenyakit,
+		);
+		$this->m_query->insert_dataset($dataset);
+		$this->m_query->update_datadiagnosa($IdDiagnosa);
+		$IdDataset = $this->m_query->get_dataset_by_NoDiagnosa($dt_diagnosa->NoDiagnosa)->IdDataset;
+		$detail_diagnosa = $this->m_query->get_detail_diagnosa($IdDiagnosa);
+		foreach($detail_diagnosa as $val){
+			$this->m_query->insert_datasetDetail($IdDataset,$val->IdGejala,$val->Status);
 		}
 		
+		redirect('dataset');
 	}
 	
 	public function laporan(){
-		$file['qdata']	  	= $this->db->query("select 
-			a . *, b.KdPenyakit, b.Penyakit, date_format(a.Tanggal,'%d-%m-%Y') as Tgl
-			from
-			mza_diagnosa a
-			inner join
-			mza_penyakit b ON b.IdPenyakit = a.IdPenyakit
-			order by a.IdDiagnosa asc")->result();
-		$file['page']	  	= "diagnosa/laporan_diagnosa";
+		$file['data_diagnosa'] 	= $this->m_query->get_dt_diagnosa();
+		$file['page']	= "diagnosa/laporan_diagnosa";
 		$this->load->view('themes',$file);
 	}
+
+
+
+
+
+
+
 	
 	public function print_diagnosa(){
 		$this->fpdf->Ln(7);

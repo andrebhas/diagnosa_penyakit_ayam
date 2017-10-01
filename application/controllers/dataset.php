@@ -12,7 +12,7 @@ class dataset extends CI_Controller {
 
 	public function index(){
 		$Search			= $this->m_query->replace($this->input->post("Search"));
-		$file['qdataset']= $this->m_query->get_array("select ds.IdDataset, ds.NoDiagnosa, ds.IdPenyakit, p.Penyakit from mza_dataset ds inner join mza_penyakit p on p.IdPenyakit=ds.IdPenyakit WHERE ds.NoDiagnosa like '%$Search%' or p.Penyakit like '%$Search%' order by ds.IdDataset asc")->result();		
+		$file['qdataset']= $this->m_query->get_array("select ds.IdDataset, ds.NoDiagnosa, ds.IdPenyakit, p.Penyakit from mza_dataset ds inner join mza_penyakit p on p.IdPenyakit=ds.IdPenyakit WHERE ds.NoDiagnosa like '%$Search%' or p.Penyakit like '%$Search%' order by ds.IdDataset DESC")->result();		
 		$file['page']	= "dataset/dataset";
 		$this->load->view('themes',$file);
 	}
